@@ -1,0 +1,45 @@
+@startuml
+
+actor Customer as C
+participant "ProductController" as PC
+participant "ProductService" as PS
+participant "OrderController" as OC
+participant "OrderService" as OS
+participant "PaymentController" as PWC
+participant "PaymentService" as PSVC
+participant "ReturnController" as RC
+participant "ReturnService" as RS
+participant "CompanyController" as CC
+
+' Customer places an order for a product
+C -> PC : Request list of products (GET /products)
+PC -> PS : getAllProducts()
+PS -> PC : Return list of products
+PC -> C : Send products to customer
+
+C -> OC : Buy a product (POST /orders)
+OC -> OS : createOrder(Order)
+OS -> OS : Save order in database
+OS -> PWC : Redirect to payment
+PWC -> PSVC : Process payment
+PSVC -> PWC : Return payment success
+PWC -> OC : Return payment confirmation
+OC -> C : Confirm order and payment
+
+' Customer wants to return a product
+C -> RC : Initiate return (POST /returns)
+RC -> RS : processReturn(Return)
+RS -> RS : Check if return is valid
+RS -> RS : Update inventory and status
+RS -> RC : Return success message
+RC -> C : Confirm return request
+
+' Customer views company details
+C -> CC : Request company details (GET /company)
+CC -> CC : Fetch company info
+CC -> C : Return company details
+
+@enduml
+
+
+
